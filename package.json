@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --output-public-path=/build/  --mode development --progress --open --hot",
-    "build": "webpack --mode production --progress",
+    "dev": "set NODE_OPTIONS=--openssl-legacy-provider  && webpack-dev-server --output-public-path=/build/  --mode development --progress --open --hot --host 0.0.0.0",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider  && webpack --mode production --progress",
     "start": "node server.js",
     "heroku-postbuild": "webpack -p"
   },
@@ -25,6 +25,7 @@
   "dependencies": {
     "@tweenjs/tween.js": "^18.6.0",
     "ammo.js": "github:kripken/ammo.js",
+    "cors": "^2.8.5",
     "dat.gui": "^0.7.7",
     "express": "^4.17.1",
     "raw-loader": "^4.0.2",

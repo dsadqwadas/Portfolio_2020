@@ -3,6 +3,8 @@ const path = require("path");
 const port = process.env.PORT || 8080;
 const app = express();
 
+
+ 
 app.use(function (req, res, next) {
   if (req.header("x-forwarded-proto") !== "https") {
     res.redirect("https://" + req.header("host") + req.baseUrl);

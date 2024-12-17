@@ -1,11 +1,13 @@
 import * as THREE from 'three';
+// 引入dat.gui.js的一个类GUI
+import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module.js';
 import { WEBGL } from './WebGL';
 import * as Ammo from './builds/ammo';
 import { billboardTextures, boxTexture, inputText, URL, stoneTexture, woodTexture } from './resources/textures';
 
 import { setupEventHandlers, moveDirection, isTouchscreenDevice, touchEvent, createJoystick } from './resources/eventHandlers';
 
-import { preloadDivs, preloadOpacity, postloadDivs, startScreenDivs, startButton, noWebGL, fadeOutDivs } from './resources/preload';
+import { preloadDivs, preloadOpacity, postloadDivs, startScreenDivs, startButton, noWebGL, fadeOutDivs,runButton} from './resources/preload';
 
 import {
   clock,
@@ -87,7 +89,7 @@ Ammo().then((Ammo) => {
       new THREE.MeshPhongMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.25,
+        opacity: 0.15,
       })
     );
     blockPlane.position.set(pos.x, pos.y, pos.z);
@@ -297,19 +299,19 @@ Ammo().then((Ammo) => {
   function loadFloydText() {
     var text_loader = new THREE.FontLoader();
 
-    text_loader.load('./src/jsm/Roboto_Regular.json', function (font) {
+    text_loader.load('./src/jsm/Source Han Sans CN Regular_Regular.json', function (font) {
       var xMid, text;
 
-      var color = 0xfffc00;
+      var color = 0xf0f5e5;
 
       var textMaterials = [
         new THREE.MeshBasicMaterial({ color: color }), // front
         new THREE.MeshPhongMaterial({ color: color }), // side
       ];
 
-      var geometry = new THREE.TextGeometry('0xFloyd', {
+      var geometry = new THREE.TextGeometry('能源电力系统元宇宙', {
         font: font,
-        size: 3,
+        size: 6,
         height: 0.5,
         curveSegments: 12,
         bevelEnabled: true,
@@ -322,7 +324,7 @@ Ammo().then((Ammo) => {
       geometry.computeBoundingBox();
       geometry.computeVertexNormals();
 
-      xMid = -0.15 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+      xMid = -0.45 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
 
       geometry.translate(xMid, 0, 0);
 
@@ -330,7 +332,7 @@ Ammo().then((Ammo) => {
 
       text = new THREE.Mesh(geometry, textMaterials);
       text.position.z = -20;
-      text.position.y = 0.1;
+      text.position.y = 12.1;
       text.receiveShadow = true;
       text.castShadow = true;
       scene.add(text);
@@ -341,19 +343,19 @@ Ammo().then((Ammo) => {
   function loadEngineerText() {
     var text_loader = new THREE.FontLoader();
 
-    text_loader.load('./src/jsm/Roboto_Regular.json', function (font) {
+    text_loader.load('./src/jsm/Source Han Sans CN Regular_Regular.json', function (font) {
       var xMid, text;
 
-      var color = 0x00ff08;
+      var color = 0xdde8c4;
 
       var textMaterials = [
         new THREE.MeshBasicMaterial({ color: color }), // front
         new THREE.MeshPhongMaterial({ color: color }), // side
       ];
 
-      var geometry = new THREE.TextGeometry('SOFTWARE ENGINEER', {
+      var geometry = new THREE.TextGeometry('沉浸式仿真交互体验', {
         font: font,
-        size: 1.5,
+        size: 3,
         height: 0.5,
         curveSegments: 20,
         bevelEnabled: true,
@@ -372,7 +374,7 @@ Ammo().then((Ammo) => {
 
       text = new THREE.Mesh(textGeo, textMaterials);
       text.position.z = -20;
-      text.position.y = 0.1;
+      text.position.y = 7.1;
       text.position.x = 24;
       text.receiveShadow = true;
       text.castShadow = true;
@@ -515,7 +517,7 @@ Ammo().then((Ammo) => {
       new THREE.BoxBufferGeometry(wallScale.x, wallScale.y, wallScale.z),
       new THREE.MeshStandardMaterial({
         color: 0xffffff,
-        opacity: 0.75,
+        opacity: 0.15,
         transparent: true,
       })
     );
@@ -539,7 +541,7 @@ Ammo().then((Ammo) => {
       new THREE.BoxBufferGeometry(wallScale.x, wallScale.y, wallScale.z),
       new THREE.MeshStandardMaterial({
         color: 0xffffff,
-        opacity: 0.75,
+        opacity: 0.15,
         transparent: true,
       })
     );
@@ -832,8 +834,9 @@ Ammo().then((Ammo) => {
     //console.log("Error loading");
   };
 
+  //添加事件监听器
   startButton.addEventListener('click', startButtonEventListener);
-
+  runButton.addEventListener('click',runButtonEventListener);
   if (isTouchscreenDevice()) {
     document.getElementById('appDirections').innerHTML =
       'Use the joystick in the bottom left to move the ball. Please use your device in portrait orientation!';
@@ -841,6 +844,58 @@ Ammo().then((Ammo) => {
     document.getElementById('joystick-wrapper').style.visibility = 'visible';
     document.getElementById('joystick').style.visibility = 'visible';
   }
+  
+  function runButtonEventListener(){
+
+    console.log('运行仿真');
+    //发送HTTP请求
+    const Http = new XMLHttpRequest();
+    const url='http://localhost:5000/runAll';
+    Http.open("GET", url,true);
+    //Http.setRequestHeader("Access-Control-Allow-Origin", "*");
+    Http.send();
+    Http.onreadystatechange=(e)=>{
+      console.log(Http.responseText);
+    }
+  }
+
+  //创建Gui布局
+  function createGui(){
+        // 实例化一个gui对象
+        const gui = new GUI();
+        //改变交互界面style属性
+        gui.domElement.style.right = '0px';
+        gui.domElement.style.width = '300px';
+        //创建一个对象，对象属性的值可以被GUI库创建的交互界面改变
+        const fault_setting = {
+          Begin_time: 0,
+          End_time: 5,
+          FaultTime:2,
+          CutoffTime:4,
+          FaultType: 1
+      };
+      const fault_map={'无故障':0,
+                 '单相短路':1,
+                 '三相短路':5
+                };
+      // gui界面上增加交互界面，改变obj对应属性
+      // 创建故障设置子菜单
+      const faultsettingFolder = gui.addFolder('故障设置');
+      faultsettingFolder.close();
+      faultsettingFolder.add(fault_setting, 'Begin_time', 0).name('仿真开始时间').step(1);
+      faultsettingFolder.add(fault_setting, 'End_time', 0, 10).name('仿真结束时间').step(1);
+      faultsettingFolder.add(fault_setting, 'FaultTime', 0, 10).name('故障开始时间').step(1);
+      faultsettingFolder.add(fault_setting, 'CutoffTime', 0, 10).name('故障结束时间').step(1);
+      faultsettingFolder.add(fault_setting, 'FaultType', ['无故障', '单相短路', '三相短路']).name('故障类型').onChange(function (value) {
+        fault_setting.FaultType = fault_map[value];
+    });
+
+        setInterval(function () {
+          console.log('x', fault_setting.FaultType);
+      }, 1000)
+
+  }
+
 
   //initialize world and begin
   function start() {
@@ -910,6 +965,12 @@ Ammo().then((Ammo) => {
     // );
 
     createBox(35, 2, -70, 4, 4, 1, boxTexture.writing, URL.devTo, 0x000000, false);
+    createBox(43, 2, -70, 4, 4, 1, boxTexture.demo1, URL.demo1, 0x000000, false);
+    //可视化案例预览区
+    createBox(43, 2, -60, 4, 4, 1, boxTexture.demo2, URL.demo2, 0x000000, false);
+    createBox(43, 2, -50, 4, 4, 1, boxTexture.demo3, URL.demo3, 0x000000, false);
+    createBox(43, 2, -40, 4, 4, 1, boxTexture.demo4, URL.demo4, 0x000000, false);
+
 
     // floatingLabel(3.875, 4.5, -70, 'Twitter');
     floatingLabel(11.875, 4.5, -70, 'Github');
@@ -917,6 +978,11 @@ Ammo().then((Ammo) => {
     floatingLabel(26.875, 4.5, -70, 'Email');
     // floatingLabel(35, 6.5, -70, '  Static \nWebsite');
     floatingLabel(35, 6.5, -70, '   How I \nmade this');
+    floatingLabel(42, 4.5, -70, '   demo1');
+    floatingLabel(42, 4.5, -60, '   demo2');
+    floatingLabel(42, 4.5, -50, '   demo3');
+    floatingLabel(42, 4.5, -40, '   demo4');
+
     // floatingLabel(44, 6.5, -70, '   How I \nmade this');
 
     // allSkillsSection(-50, 0.025, 20, 40, 40, boxTexture.allSkills);
@@ -950,6 +1016,12 @@ Ammo().then((Ammo) => {
     createTriangle(63, -47);
     createTriangle(63, -43);
 
+
+
+
+
+
+    createGui();
     addParticles();
     glowingParticles();
     generateGalaxy();

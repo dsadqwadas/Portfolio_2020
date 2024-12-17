@@ -3,7 +3,10 @@ export let preloadOpacity = document.getElementsByClassName('preload-overlay');
 export let postloadDivs = document.getElementsByClassName('postload');
 export let startScreenDivs = document.getElementsByClassName('start-screen');
 export let startButton = document.getElementById('start-button');
+export let runButton=document.getElementById('runButton');
 export let fadeOutDivs = document.getElementsByClassName('fadeOutDiv');
+
+
 
 export function noWebGL() {
   for (let i = 0; i < preloadDivs.length; i++) {
